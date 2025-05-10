@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scout Login</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/>
+                </svg>
+            </div>
+            <h1>Scout Login</h1>
+            <p class="subtitle">Log in to access your Scout dashboard</p>
+        </div>
+        
+        <div class="success-message" id="success-message">
+            Login successful! Redirecting to dashboard...
+        </div>
+        
+        <div id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password">
+            </div>
+            
+            <div class="forgot-password">
+                <a href="#">Forgot password?</a>
+            </div>
+            
+            <button class="login-btn">Login</button>
+            
+            <div class="divider">
+                <span class="divider-text">or</span>
+            </div>
+            
+            <div class="google-btn">
+                <div id="g_id_onload"
+                    data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                    data-context="signin"
+                    data-callback="handleCredentialResponse">
+                </div>
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-size="large"
+                    data-theme="outline"
+                    data-text="sign_in_with"
+                    data-shape="rectangular"
+                    data-logo_alignment="center">
+                </div>
+            </div>
+            
+            <div class="register-link">
+                Don't have an account? <a href="#">Register</a>
+            </div>
+        </div>
+        
+        <div id="user-info">
+            <img id="user-image" src="/api/placeholder/60/60" alt="User Profile">
+            <h3 id="user-name">User Name</h3>
+            <p id="user-email">user@example.com</p>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </div>
+    
+    <script>
+        // Function to handle Google Sign-In credential response
+        function handleCredentialResponse(response) {
+            // Decode the JWT token to get user information
+            const responsePayload = parseJwt(response.credential);
+            
+            // Display user information
+            document.getElementById('user-image').src = responsePayload.picture;
+            document.getElementById('user-name').textContent = responsePayload.name;
+            document.getElementById('user-email').textContent = responsePayload.email;
+            
+            // Hide login form and show user info
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('user-info').style.display = 'block';
+            
+            // Show success message
+            document.getElementById('success-message').style.display = 'block';
+            
+            // Store user information in session storage
+            sessionStorage.setItem('user', JSON.stringify({
+                name: responsePayload.name,
+                email: responsePayload.email,
+                picture: responsePayload.picture
+            }));
+            
+            // Simulate redirection to dashboard after a delay
+            setTimeout(() => {
+                alert("In a real application, you would be redirected to the scout dashboard now.");
+                // window.location.href = 'dashboard.html';
+            }, 2000);
+        }
+        
+        // Function to parse JWT token
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            
+            return JSON.parse(jsonPayload);
+        }
+        
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedUser = sessionStorage.getItem('user');
+            
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                document.getElementById('user-image').src = user.picture;
+                document.getElementById('user-name').textContent = user.name;
+                document.getElementById('user-email').textContent = user.email;
+                
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('user-info').style.display = 'block';
+            }
+            
+            // Regular login button click handler
+            document.querySelector('.login-btn').addEventListener('click', () => {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                if (email && password) {
+                    document.getElementById('success-message').style.display = 'block';
+                    document.getElementById('login-form').style.display = 'none';
+                    
+                    // Simulate a user login (in a real app, this would verify credentials with a server)
+                    setTimeout(() => {
+                        alert("In a real application, credentials would be verified with your server.");
+                        // window.location.href = 'dashboard.html';
+                    }, 2000);
+                } else {
+                    alert("Please enter both email and password.");
+                }
+            });
+            
+            // Logout button click handler
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                // Clear session storage
+                sessionStorage.removeItem('user');
+                
+                // Hide user info and show login form
+                document.getElementById('user-info').style.display = 'none';
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+                
+                // Clear form fields
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                
+                // Sign out from Google
+                google.accounts.id.disableAutoSelect();
+            });
+        });
+    </script>
+</body>
+</html>
