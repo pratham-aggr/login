@@ -18,15 +18,10 @@ function handleCredentialResponse(response) {
     const userEmail = responsePayload.email.toLowerCase();
 
     setTimeout(() => {
-        if (userEmail === "prathamaggarwal7586@gmail.com") {
+        if (userEmail === "fzbatshon@gmail.com") {
             window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/your-portal";
-        } else if (userEmail === "fzbatshon@gmail.com") {
-            window.location.href = " https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
         } else {
-            alert("Email not recognized. Access denied.");
-            document.getElementById('success-message').style.display = 'none';
-            document.getElementById('login-form').style.display = 'block';
-            document.getElementById('user-info').style.display = 'none';
+            window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
         }
     }, 2000);
 }
