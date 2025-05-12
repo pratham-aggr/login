@@ -61,14 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('login-form').style.display = 'none';
 
             setTimeout(() => {
-                if (email === "prathamaggarwal7586@gmail.com") {
-                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/leader-portal";
-                } else if (email === "fzbatshon@ucsd.edu") {
-                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/member-portal";
+                if (userEmail === "fzbatshon@gmail.com") {
+                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/your-portal";
                 } else {
-                    alert("Email not recognized. Access denied.");
-                    document.getElementById('success-message').style.display = 'none';
-                    document.getElementById('login-form').style.display = 'block';
+                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
                 }
             }, 2000);
         } else {
