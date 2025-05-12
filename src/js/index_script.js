@@ -20,7 +20,7 @@ function handleCredentialResponse(response) {
     setTimeout(() => {
         if (userEmail === "prathamaggarwal7586@gmail.com") {
             window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/leader-portal";
-        } else if (userEmail === "fzbatshon@ucsd.edu") {
+        } else if (userEmail === "fzbatshon@gmail.com") {
             window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/member-portal";
         } else {
             alert("Email not recognized. Access denied.");
