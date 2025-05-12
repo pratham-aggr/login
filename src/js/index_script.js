@@ -21,7 +21,7 @@ function handleCredentialResponse(response) {
         if (userEmail === "prathamaggarwal7586@gmail.com") {
             window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/leader-portal";
         } else if (userEmail === "fzbatshon@gmail.com") {
-            window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/member-portal";
+            window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
         } else {
             alert("Email not recognized. Access denied.");
             document.getElementById('success-message').style.display = 'none';
