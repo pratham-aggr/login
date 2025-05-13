@@ -27,37 +27,35 @@ function handleCredentialResponse(response) {
 
         // Public URL of the Google Sheet as CSV
     const sheetURL = "https://docs.google.com/spreadsheets/d/1xsinmzQkO-_fRAmX7-ewWuBf95alMpBFWQfx1Zh5UmI/edit?gid=1237977068#gid=1237977068";
-
-    // Function to fetch and parse CSV using PapaParse
+    // Function to fetch email list from the sheet and redirect the user
     function fetchEmailListAndRedirect() {
         Papa.parse(sheetURL, {
-            download: true,          // Tells PapaParse to fetch the CSV from URL
-            header: true,            // Automatically use the first row as keys: "Full Name", "Emails"
-            skipEmptyLines: true,    // Ignores empty rows
-            complete: function(results) {
-                // Extract only the "Emails" column into a list
-                const emailList = results.data.map(row => row["Emails"]?.trim());
+            download: true,           // Tell PapaParse to fetch the CSV from a URL
+            header: true,             // Use the first row as column headers
+            skipEmptyLines: true,     // Ignore empty rows
 
-                // Check if the current user's email exists in the list
+            complete: function(results) {
+                // Get all emails from the "Emails" column, trimming whitespace
+                const emailList = results.data.map(row => row["Emails"]?.trim()).filter(email => !!email);
+
+                // Check if userEmail is in the list
                 if (emailList.includes(userEmail)) {
-                    // Redirect to the private portal
+                    // Redirect to private portal if matched
                     window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/your-portal";
                 } else {
-                    // Redirect to the general members dashboard
+                    // Redirect to general members dashboard otherwise
                     window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
                 }
             },
-            error: function(error) {
-                // Log parsing or network errors
-                console.error("PapaParse error:", error);
 
-                // Fallback redirect
+            error: function(error) {
+                // Log any error and redirect to fallback
+                console.error("Error loading or parsing CSV:", error);
                 window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
             }
         });
     }
-
-    // Wait 2 seconds before executing
+    // Wait 2 seconds before checking and redirecting
     setTimeout(fetchEmailListAndRedirect, 2000);
 }
 
