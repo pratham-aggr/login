@@ -17,46 +17,78 @@ function handleCredentialResponse(response) {
 
     const userEmail = responsePayload.email.toLowerCase();
 
-    // setTimeout(() => {
-    //     if (userEmail === "fzbatshon@gmail.com") {
-    //         window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/your-portal";
-    //     } else {
-    //         window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
-    //     }
-    // }, 2000);
+    // Fixed: Use the correct URL format for CSV and proper redirection logic
+    redirectUserBasedOnEmail(userEmail);
+}
 
-        // Public URL of the Google Sheet as CSV
-    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlMoOn8NXcQgIrzDq-MAbQBMIQkIKeOCXo4TvSsPfevN3iMwIGiHWjcCxpLVZnyRelW1WICD6nfFGL/pubhtml";
-    // Function to fetch email list from the sheet and redirect the user
-    function fetchEmailListAndRedirect() {
-        Papa.parse(sheetURL, {
-            download: true,           // Tell PapaParse to fetch the CSV from a URL
-            header: true,             // Use the first row as column headers
-            skipEmptyLines: true,     // Ignore empty rows
-
-            complete: function(results) {
-                // Get all emails from the "Emails" column, trimming whitespace
-                const emailList = results.data.map(row => row["Emails"]?.trim()).filter(email => !!email);
-
-                // Check if userEmail is in the list
-                if (emailList.includes(userEmail)) {
-                    // Redirect to private portal if matched
-                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/your-portal";
-                } else {
-                    // Redirect to general members dashboard otherwise
-                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
-                }
-            },
-
-            error: function(error) {
-                // Log any error and redirect to fallback
-                console.error("Error loading or parsing CSV:", error);
-                window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
+// Function to redirect user based on email access level
+function redirectUserBasedOnEmail(userEmail) {
+    // IMPORTANT: Change the URL format from pubhtml to pub?output=csv
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlMoOn8NXcQgIrzDq-MAbQBMIQkIKeOCXo4TvSsPfevN3iMwIGiHWjcCxpLVZnyRelW1WICD6nfFGL/pub?output=csv";
+    
+    console.log("Checking access for email:", userEmail);
+    
+    Papa.parse(sheetURL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            console.log("CSV Data loaded:", results.data);
+            
+            // Check if we have valid data
+            if (!results.data || results.data.length === 0) {
+                console.error("No data found in the CSV");
+                fallbackRedirect();
+                return;
             }
-        });
-    }
-    // Wait 2 seconds before checking and redirecting
-    setTimeout(fetchEmailListAndRedirect, 2000);
+            
+            // Find the correct column name (case insensitive)
+            const emailColumnName = Object.keys(results.data[0]).find(
+                key => key.toLowerCase().includes('email')
+            );
+            
+            if (!emailColumnName) {
+                console.error("No email column found in the CSV");
+                fallbackRedirect();
+                return;
+            }
+            
+            console.log("Using email column:", emailColumnName);
+            
+            // Extract emails, clean them and convert to lowercase
+            const emailList = results.data
+                .map(row => row[emailColumnName]?.trim().toLowerCase())
+                .filter(email => !!email);
+                
+            console.log("Authorized emails:", emailList);
+            console.log("User email to check:", userEmail);
+            
+            // Check if userEmail is in the list
+            if (emailList.includes(userEmail)) {
+                console.log("Email found! Redirecting to leader portal");
+                setTimeout(() => {
+                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/your-portal";
+                }, 2000);
+            } else {
+                console.log("Email not found. Redirecting to members dashboard");
+                setTimeout(() => {
+                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
+                }, 2000);
+            }
+        },
+        error: function(error) {
+            console.error("Error loading or parsing CSV:", error);
+            fallbackRedirect();
+        }
+    });
+}
+
+// Fallback redirect function
+function fallbackRedirect() {
+    console.log("Using fallback redirect to members dashboard");
+    setTimeout(() => {
+        window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
+    }, 2000);
 }
 
 // Function to parse JWT token
@@ -82,6 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('login-form').style.display = 'none';
         document.getElementById('user-info').style.display = 'block';
+        
+        // Also check redirection for already logged in users
+        redirectUserBasedOnEmail(user.email.toLowerCase());
     }
 
     // Regular login button click handler
@@ -93,13 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('success-message').style.display = 'block';
             document.getElementById('login-form').style.display = 'none';
 
-            setTimeout(() => {
-                if (userEmail === "fzbatshon@gmail.com") {
-                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/your-portal";
-                } else {
-                    window.location.href = "https://sites.google.com/view/swefiehorthodoxscout/members-dashboard";
-                }
-            }, 2000);
+            // Use the same redirection function for consistency
+            redirectUserBasedOnEmail(email);
         } else {
             alert("Please enter both email and password.");
         }
