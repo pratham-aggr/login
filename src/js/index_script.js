@@ -25,8 +25,8 @@ function handleCredentialResponse(response) {
     //     }
     // }, 2000);
 
-    // Public URL of the Google Sheet as CSV
-    const sheetURL = "https://docs.google.com/spreadsheets/d/1xsinmzQkO-_fRAmX7-ewWuBf95alMpBFWQfx1Zh5UmI/edit?gid=1237977068#gid=1237977068";
+        // Public URL of the Google Sheet as CSV
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlMoOn8NXcQgIrzDq-MAbQBMIQkIKeOCXo4TvSsPfevN3iMwIGiHWjcCxpLVZnyRelW1WICD6nfFGL/pubhtml";
     // Function to fetch email list from the sheet and redirect the user
     function fetchEmailListAndRedirect() {
         Papa.parse(sheetURL, {
@@ -103,5 +103,19 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             alert("Please enter both email and password.");
         }
+    });
+
+    // Logout button click handler
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        sessionStorage.removeItem('user');
+
+        document.getElementById('user-info').style.display = 'none';
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('success-message').style.display = 'none';
+
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+
+        google.accounts.id.disableAutoSelect();
     });
 });
